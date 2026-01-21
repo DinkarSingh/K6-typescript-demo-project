@@ -248,10 +248,10 @@ All test settings are centralized in `config.ts`:
 
 ```typescript
 export const config = {
-  baseUrl: "https://demo.realworld.show",
+  baseUrl: 'https://demo.realworld.show',
   endpoints: {
-    articles: "/api/articles",
-    login: "/api/users/login",
+    articles: '/api/articles',
+    login: '/api/users/login',
     // ... more endpoints
   },
   thresholds: {
@@ -273,7 +273,7 @@ export const config = {
 Edit `config.ts`:
 
 ```typescript
-baseUrl: "https://your-api.com";
+baseUrl: 'https://your-api.com';
 ```
 
 #### Adjust Load Patterns
@@ -282,9 +282,9 @@ Edit individual test files:
 
 ```typescript
 stages: [
-  { duration: "2m", target: 20 }, // Your desired pattern
-  { duration: "5m", target: 20 },
-  { duration: "2m", target: 0 },
+  { duration: '2m', target: 20 }, // Your desired pattern
+  { duration: '5m', target: 20 },
+  { duration: '2m', target: 0 },
 ];
 ```
 
@@ -362,11 +362,13 @@ Monitor these system metrics alongside k6 results:
 ### After Tests
 
 1. **Response Time Analysis**
+
    - Look for trends and patterns
    - Identify slow endpoints
    - Check for performance degradation
 
 2. **Error Analysis**
+
    - Categorize error types
    - Identify error patterns
    - Check error recovery

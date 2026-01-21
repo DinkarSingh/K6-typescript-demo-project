@@ -38,17 +38,13 @@ export function registerUser(userData: any): ApiResponse {
     user: {
       username: userData.username,
       email: userData.email,
-      password: userData.password
-    }
+      password: userData.password,
+    },
   };
 
-  const response = http.post(
-    config.baseUrl + config.endpoints.register,
-    JSON.stringify(payload),
-    {
-      headers: { 'Content-Type': 'application/json' }
-    }
-  );
+  const response = http.post(config.baseUrl + config.endpoints.register, JSON.stringify(payload), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 
   check(response, {
     'User registration successful': (r) => r.status === 200,
@@ -59,37 +55,33 @@ export function registerUser(userData: any): ApiResponse {
       } catch {
         return false;
       }
-    }
+    },
   });
 
   return {
     status: response.status,
     body: response.body,
-    headers: response.headers
+    headers: response.headers,
   };
 }
 
 /**
  * Login user and get authentication token
  * @param email - User email
- * @param password - User password  
+ * @param password - User password
  * @returns Login response with token
  */
 export function loginUser(email: string, password: string): LoginResponse | null {
   const payload = {
     user: {
       email: email,
-      password: password
-    }
+      password: password,
+    },
   };
 
-  const response = http.post(
-    config.baseUrl + config.endpoints.login,
-    JSON.stringify(payload),
-    {
-      headers: { 'Content-Type': 'application/json' }
-    }
-  );
+  const response = http.post(config.baseUrl + config.endpoints.login, JSON.stringify(payload), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 
   const loginSuccessful = check(response, {
     'Login successful': (r) => r.status === 200,
@@ -100,7 +92,7 @@ export function loginUser(email: string, password: string): LoginResponse | null
       } catch {
         return false;
       }
-    }
+    },
   });
 
   if (loginSuccessful && response.status === 200) {
@@ -118,7 +110,7 @@ export function loginUser(email: string, password: string): LoginResponse | null
  */
 export function fetchArticles(limit: number = 20, offset: number = 0): ApiResponse {
   const url = `${config.baseUrl}${config.endpoints.articles}?limit=${limit}&offset=${offset}`;
-  
+
   const response = http.get(url);
 
   check(response, {
@@ -130,13 +122,13 @@ export function fetchArticles(limit: number = 20, offset: number = 0): ApiRespon
       } catch {
         return false;
       }
-    }
+    },
   });
 
   return {
     status: response.status,
     body: response.body,
-    headers: response.headers
+    headers: response.headers,
   };
 }
 
@@ -148,13 +140,13 @@ export function fetchArticles(limit: number = 20, offset: number = 0): ApiRespon
  */
 export function createArticle(token: string, articleData: any): ApiResponse {
   const payload = {
-    article: articleData
+    article: articleData,
   };
 
   const response = http.post(
     config.baseUrl + config.endpoints.createArticle,
     JSON.stringify(payload),
-    createAuthHeader(token)
+    createAuthHeader(token),
   );
 
   check(response, {
@@ -166,13 +158,13 @@ export function createArticle(token: string, articleData: any): ApiResponse {
       } catch {
         return false;
       }
-    }
+    },
   });
 
   return {
     status: response.status,
     body: response.body,
-    headers: response.headers
+    headers: response.headers,
   };
 }
 
@@ -192,13 +184,13 @@ export function fetchTags(): ApiResponse {
       } catch {
         return false;
       }
-    }
+    },
   });
 
   return {
     status: response.status,
     body: response.body,
-    headers: response.headers
+    headers: response.headers,
   };
 }
 
@@ -208,11 +200,11 @@ export function fetchTags(): ApiResponse {
 export function generateRandomUserData() {
   const timestamp = Date.now();
   const randomNum = Math.floor(Math.random() * 1000);
-  
+
   return {
     username: `testuser_${timestamp}_${randomNum}`,
     email: `testuser_${timestamp}_${randomNum}@example.com`,
-    password: 'testpassword123'
+    password: 'testpassword123',
   };
 }
 
@@ -222,11 +214,11 @@ export function generateRandomUserData() {
 export function generateRandomArticle() {
   const timestamp = Date.now();
   const randomNum = Math.floor(Math.random() * 1000);
-  
+
   return {
     title: `Test Article ${timestamp} ${randomNum}`,
     description: `This is a test article created at ${new Date().toISOString()}`,
     body: `This is the body of test article created during performance testing. Timestamp: ${timestamp}, Random: ${randomNum}`,
-    tagList: ['performance', 'testing', 'k6', `tag${randomNum}`]
+    tagList: ['performance', 'testing', 'k6', `tag${randomNum}`],
   };
 }

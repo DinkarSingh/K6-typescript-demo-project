@@ -11,26 +11,32 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
 import { config } from '../config.ts';
-import { fetchArticles, fetchTags, generateRandomUserData, registerUser, loginUser } from './utils.ts';
+import {
+  fetchArticles,
+  fetchTags,
+  generateRandomUserData,
+  registerUser,
+  loginUser,
+} from './utils.ts';
 
 // Stress test configuration - higher load than normal
 export const options: Options = {
   stages: [
     // Gradual ramp-up to high load
-    { duration: '2m', target: 20 },   // Ramp up to 20 users  
-    { duration: '5m', target: 50 },   // Ramp up to 50 users
+    { duration: '2m', target: 20 }, // Ramp up to 20 users
+    { duration: '5m', target: 50 }, // Ramp up to 50 users
     { duration: '10m', target: 100 }, // Ramp up to 100 users (high stress)
-    { duration: '3m', target: 100 },  // Stay at 100 users
-    { duration: '2m', target: 0 },    // Quick ramp down
+    { duration: '3m', target: 100 }, // Stay at 100 users
+    { duration: '2m', target: 0 }, // Quick ramp down
   ],
-  
+
   // More lenient thresholds for stress testing
   thresholds: config.thresholds.stress,
-  
+
   tags: {
     testType: 'stress',
-    environment: 'demo'
-  }
+    environment: 'demo',
+  },
 };
 
 export function setup() {
@@ -38,7 +44,7 @@ export function setup() {
   console.log(`Target URL: ${config.baseUrl}`);
   console.log('This test will push your application to its limits!');
   console.log('We will gradually increase load to 100 concurrent users');
-  
+
   // Pre-create some test users for stress testing
   const testUsers = [];
   for (let i = 0; i < 5; i++) {
@@ -49,20 +55,20 @@ export function setup() {
       if (loginResponse) {
         testUsers.push({
           token: loginResponse.user.token,
-          userData: userData
+          userData: userData,
         });
       }
     }
   }
-  
+
   console.log(`✅ Created ${testUsers.length} test users for stress testing`);
   return { testUsers: testUsers };
 }
 
-export default function(data: any) {
+export default function (data: any) {
   // More aggressive user behavior patterns during stress test
   const behaviorType = Math.random();
-  
+
   if (behaviorType < 0.4) {
     // 40% - Rapid article browsing (high read load)
     rapidArticleBrowsing();
@@ -78,7 +84,7 @@ export default function(data: any) {
       rapidArticleBrowsing();
     }
   }
-  
+
   // Shorter sleep times to create more stress
   sleep(Math.random() * 1 + 0.5); // 0.5 to 1.5 seconds
 }
@@ -88,11 +94,11 @@ function rapidArticleBrowsing() {
   for (let i = 0; i < 3; i++) {
     const offset = i * 10;
     const response = fetchArticles(10, offset);
-    
+
     check(response, {
       [`Rapid browse page ${i + 1} - success`]: (r) => r.status === 200,
     });
-    
+
     // Very short think time
     sleep(0.2);
   }
@@ -106,15 +112,15 @@ function mixedBrowsingStress() {
       url: config.baseUrl + config.endpoints.articles,
     },
     {
-      method: 'GET', 
+      method: 'GET',
       url: config.baseUrl + config.endpoints.tags,
     },
     {
       method: 'GET',
       url: config.baseUrl + config.endpoints.articles + '?limit=5&offset=0',
-    }
+    },
   ]);
-  
+
   // Check all batch responses
   for (let i = 0; i < responses.length; i++) {
     check(responses[i], {
@@ -126,29 +132,29 @@ function mixedBrowsingStress() {
 function authenticatedStressActions(token: string) {
   // Authenticated user making multiple requests quickly
   const headers = {
-    'Authorization': `Token ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Token ${token}`,
+    'Content-Type': 'application/json',
   };
-  
+
   // Batch authenticated requests
   const responses = http.batch([
     {
       method: 'GET',
       url: config.baseUrl + config.endpoints.profile,
-      headers: headers
+      headers: headers,
     },
     {
       method: 'GET',
       url: config.baseUrl + config.endpoints.articles,
-      headers: headers  
+      headers: headers,
     },
     {
       method: 'GET',
       url: config.baseUrl + config.endpoints.articles + '?limit=20&offset=0',
-      headers: headers
-    }
+      headers: headers,
+    },
   ]);
-  
+
   let successCount = 0;
   responses.forEach((response, index) => {
     const success = check(response, {
@@ -156,7 +162,7 @@ function authenticatedStressActions(token: string) {
     });
     if (success) successCount++;
   });
-  
+
   // Track success rate during stress
   check(null, {
     'Authenticated stress batch - majority success': () => successCount >= responses.length * 0.7,

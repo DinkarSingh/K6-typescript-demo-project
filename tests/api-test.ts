@@ -12,37 +12,37 @@ import http from 'k6/http';
 import { check, sleep, group } from 'k6';
 import { Options } from 'k6/options';
 import { config, createAuthHeader } from '../config.ts';
-import { 
-  fetchArticles, 
-  fetchTags, 
-  generateRandomUserData, 
-  registerUser, 
+import {
+  fetchArticles,
+  fetchTags,
+  generateRandomUserData,
+  registerUser,
   loginUser,
   createArticle,
-  generateRandomArticle
+  generateRandomArticle,
 } from './utils.ts';
 
 // API test configuration - moderate load focused on functionality
 export const options: Options = {
   stages: [
-    { duration: '2m', target: 10 },   // Ramp up to 10 users
-    { duration: '8m', target: 10 },   // Maintain load while testing APIs
-    { duration: '2m', target: 0 },    // Ramp down
+    { duration: '2m', target: 10 }, // Ramp up to 10 users
+    { duration: '8m', target: 10 }, // Maintain load while testing APIs
+    { duration: '2m', target: 0 }, // Ramp down
   ],
-  
+
   thresholds: {
-    http_req_duration: ['p(95)<3000'],     // API calls should be reasonably fast
-    http_req_failed: ['rate<0.1'],         // Low failure rate
-    'group_duration{group:::Public API}': ['p(95)<2000'],        // Public API performance
-    'group_duration{group:::Authentication}': ['p(95)<3000'],     // Auth API performance  
-    'group_duration{group:::User Management}': ['p(95)<3000'],    // User API performance
+    http_req_duration: ['p(95)<3000'], // API calls should be reasonably fast
+    http_req_failed: ['rate<0.1'], // Low failure rate
+    'group_duration{group:::Public API}': ['p(95)<2000'], // Public API performance
+    'group_duration{group:::Authentication}': ['p(95)<3000'], // Auth API performance
+    'group_duration{group:::User Management}': ['p(95)<3000'], // User API performance
     'group_duration{group:::Article Management}': ['p(95)<4000'], // Article API performance
   },
-  
+
   tags: {
     testType: 'api',
-    environment: 'demo'
-  }
+    environment: 'demo',
+  },
 };
 
 export function setup() {
@@ -70,14 +70,14 @@ export function setup() {
   console.log('   - Article favoriting');
   console.log('   - Article comments');
   console.log('');
-  
+
   return {};
 }
 
-export default function(data: any) {
+export default function (data: any) {
   // Run different API test scenarios
   const apiScenario = Math.random();
-  
+
   if (apiScenario < 0.3) {
     // 30% - Public API testing
     testPublicAPIs();
@@ -88,7 +88,7 @@ export default function(data: any) {
     // 40% - Complete user workflow testing
     testCompleteUserWorkflow();
   }
-  
+
   sleep(Math.random() * 2 + 1);
 }
 
@@ -107,19 +107,19 @@ function testPublicAPIs() {
           } catch {
             return false;
           }
-        }
+        },
       });
-      
+
       sleep(0.5);
-      
+
       // Test pagination
       const paginatedResponse = fetchArticles(5, 10);
       check(paginatedResponse, {
         'Public - Articles pagination works': (r) => r.status === 200,
       });
-      
+
       sleep(0.5);
-      
+
       // Test with different limits
       const limitedResponse = fetchArticles(1, 0);
       check(limitedResponse, {
@@ -131,12 +131,12 @@ function testPublicAPIs() {
           } catch {
             return false;
           }
-        }
+        },
       });
     });
-    
+
     sleep(1);
-    
+
     // Test tags endpoint
     group('Tags API', () => {
       const tagsResponse = fetchTags();
@@ -149,7 +149,7 @@ function testPublicAPIs() {
           } catch {
             return false;
           }
-        }
+        },
       });
     });
   });
@@ -158,11 +158,11 @@ function testPublicAPIs() {
 function testAuthenticationFlow() {
   group('Authentication', () => {
     const userData = generateRandomUserData();
-    
+
     // Test user registration
     group('User Registration', () => {
       const regResponse = registerUser(userData);
-      
+
       const regSuccess = check(regResponse, {
         'Auth - Registration successful': (r) => r.status === 200,
         'Auth - Registration returns user data': (r) => {
@@ -172,40 +172,42 @@ function testAuthenticationFlow() {
           } catch {
             return false;
           }
-        }
+        },
       });
-      
+
       if (!regSuccess) {
         console.log(`Registration failed for ${userData.email}`);
         return; // Skip login test if registration failed
       }
     });
-    
+
     sleep(1);
-    
+
     // Test user login
     group('User Login', () => {
       const loginResponse = loginUser(userData.email, userData.password);
-      
+
       if (loginResponse) {
         check(null, {
           'Auth - Login successful': () => true,
           'Auth - Token received': () => loginResponse.user.token.length > 0,
           'Auth - User data complete': () => {
-            return loginResponse.user.email === userData.email &&
-                   loginResponse.user.username === userData.username;
-          }
+            return (
+              loginResponse.user.email === userData.email &&
+              loginResponse.user.username === userData.username
+            );
+          },
         });
-        
+
         sleep(1);
-        
+
         // Test token validation
         group('Token Validation', () => {
           const profileResponse = http.get(
             config.baseUrl + config.endpoints.profile,
-            createAuthHeader(loginResponse.user.token)
+            createAuthHeader(loginResponse.user.token),
           );
-          
+
           check(profileResponse, {
             'Auth - Token validation successful': (r) => r.status === 200,
             'Auth - Profile data matches': (r) => {
@@ -215,7 +217,7 @@ function testAuthenticationFlow() {
               } catch {
                 return false;
               }
-            }
+            },
           });
         });
       } else {
@@ -231,7 +233,7 @@ function testCompleteUserWorkflow() {
   group('User Management', () => {
     const userData = generateRandomUserData();
     let userToken = '';
-    
+
     // Setup: Create and authenticate user
     const regResponse = registerUser(userData);
     if (regResponse.status === 200) {
@@ -240,19 +242,19 @@ function testCompleteUserWorkflow() {
         userToken = loginResponse.user.token;
       }
     }
-    
+
     if (!userToken) {
       console.log('User workflow test skipped - authentication failed');
       return;
     }
-    
+
     // Test authenticated profile access
     group('Profile Management', () => {
       const profileResponse = http.get(
         config.baseUrl + config.endpoints.profile,
-        createAuthHeader(userToken)
+        createAuthHeader(userToken),
       );
-      
+
       check(profileResponse, {
         'User - Profile access successful': (r) => r.status === 200,
         'User - Profile has user data': (r) => {
@@ -262,30 +264,30 @@ function testCompleteUserWorkflow() {
           } catch {
             return false;
           }
-        }
+        },
       });
     });
-    
+
     sleep(1);
-    
+
     // Test article management
     group('Article Management', () => {
       // Browse articles as authenticated user
       const authArticlesResponse = http.get(
         config.baseUrl + config.endpoints.articles,
-        createAuthHeader(userToken)
+        createAuthHeader(userToken),
       );
-      
+
       check(authArticlesResponse, {
         'User - Authenticated articles access': (r) => r.status === 200,
       });
-      
+
       sleep(1);
-      
+
       // Create an article
       const articleData = generateRandomArticle();
       const createResponse = createArticle(userToken, articleData);
-      
+
       const articleCreated = check(createResponse, {
         'User - Article creation successful': (r) => r.status === 200 || r.status === 201,
         'User - Created article has slug': (r) => {
@@ -295,27 +297,26 @@ function testCompleteUserWorkflow() {
           } catch {
             return false;
           }
-        }
+        },
       });
-      
+
       if (articleCreated && createResponse.status === 200) {
         try {
           const createdArticle = JSON.parse(createResponse.body as string);
           const slug = createdArticle.article.slug;
-          
+
           sleep(1);
-          
+
           // Test favoriting the created article
           const favoriteResponse = http.post(
             config.baseUrl + config.endpoints.favoriteArticle(slug),
             '',
-            createAuthHeader(userToken)
+            createAuthHeader(userToken),
           );
-          
+
           check(favoriteResponse, {
             'User - Article favoriting works': (r) => r.status === 200 || r.status === 201,
           });
-          
         } catch (e) {
           console.log('Article operations failed:', e);
         }
@@ -332,7 +333,7 @@ export function teardown(data: any) {
   console.log('📋 Test Coverage Completed:');
   console.log('✅ Public API endpoints (articles, tags)');
   console.log('✅ Authentication flow (register, login, validation)');
-  console.log('✅ User profile management');  
+  console.log('✅ User profile management');
   console.log('✅ Article management (create, favorite)');
   console.log('✅ Error handling and edge cases');
   console.log('');
