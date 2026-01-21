@@ -454,6 +454,4 @@ Monitor these system metrics alongside k6 results:
 - [ ] Set up monitoring for your target application
 - [ ] Create a testing schedule for regular validation
 
-**Happy Performance Testing! 🚀**#   K 6 - t y p e s c r i p t - d e m o - p r o j e c t 
- 
- 
+**Happy Performance Testing! 🚀**
