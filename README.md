@@ -39,7 +39,13 @@ k6_performance_test/
 
 ### Running Tests
 
-#### 1. API Test (Start Here!)
+#### 1. Build the tests
+
+```bash
+npm run build
+```
+
+#### 2. API Test (Start Here!)
 
 _Validates basic functionality and API endpoints_
 
@@ -51,7 +57,7 @@ k6 run tests/api-test.ts
 - **Users**: 10 concurrent
 - **Purpose**: Validate API functionality before performance testing
 
-#### 2. Load Test
+#### 3. Load Test
 
 _Establishes baseline performance under normal conditions_
 
@@ -63,7 +69,7 @@ k6 run tests/load-test.ts
 - **Users**: 10-20 concurrent
 - **Purpose**: Understand normal performance characteristics
 
-#### 3. Stress Test
+#### 4. Stress Test
 
 _Finds your application's breaking point_
 
@@ -75,7 +81,7 @@ k6 run tests/stress-test.ts
 - **Users**: 20-100 concurrent
 - **Purpose**: Identify maximum sustainable load
 
-#### 4. Spike Test
+#### 5. Spike Test
 
 _Tests behavior during sudden traffic increases_
 
@@ -87,7 +93,7 @@ k6 run tests/spike-test.ts
 - **Users**: 10-200 concurrent (sudden spikes)
 - **Purpose**: Validate traffic spike handling
 
-#### 5. Volume Test
+#### 6. Volume Test
 
 _Tests performance with large amounts of data_
 
@@ -99,7 +105,7 @@ k6 run tests/volume-test.ts
 - **Users**: 5-25 concurrent
 - **Purpose**: Database and data handling performance
 
-#### 6. Soak Test (Advanced)
+#### 7. Soak Test (Advanced)
 
 _Long-term stability and memory leak detection_
 

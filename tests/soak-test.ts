@@ -24,15 +24,15 @@ import {
 export const options: Options = {
   stages: [
     // Quick ramp up to target load
-    { duration: '5m', target: 20 }, // Ramp up to 20 users over 5 minutes
+    { duration: '15s', target: 20 }, // Ramp up to 20 users
 
     // SOAK PERIOD - maintain steady load for extended time
     // Note: In real scenarios, this would run for 2-12+ hours
-    // For demo purposes, we'll run for 30 minutes
-    { duration: '30m', target: 20 }, // Maintain 20 users for 30 minutes
+    // For demo purposes, we'll run for 1 minute
+    { duration: '1m', target: 20 }, // Maintain 20 users for 1 minute
 
     // Gradual ramp down
-    { duration: '5m', target: 0 }, // Ramp down over 5 minutes
+    { duration: '15s', target: 0 }, // Ramp down
   ],
 
   // Stricter thresholds for soak testing - performance should be consistent

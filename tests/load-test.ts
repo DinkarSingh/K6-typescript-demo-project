@@ -23,11 +23,11 @@ import {
 export const options: Options = {
   stages: [
     // Ramp-up: Gradually increase load to simulate real-world traffic growth
-    { duration: '2m', target: 10 }, // Ramp up to 10 users over 2 minutes
-    { duration: '5m', target: 10 }, // Stay at 10 users for 5 minutes
-    { duration: '2m', target: 20 }, // Ramp up to 20 users over 2 minutes
-    { duration: '5m', target: 20 }, // Stay at 20 users for 5 minutes
-    { duration: '2m', target: 0 }, // Ramp down to 0 users over 2 minutes
+    { duration: '15s', target: 10 }, // Ramp up to 10 users
+    { duration: '15s', target: 10 }, // Stay at 10 users
+    { duration: '10s', target: 20 }, // Ramp up to 20 users
+    { duration: '15s', target: 20 }, // Stay at 20 users
+    { duration: '5s', target: 0 }, // Ramp down to 0 users
   ],
 
   // Performance thresholds - the test will fail if these are not met

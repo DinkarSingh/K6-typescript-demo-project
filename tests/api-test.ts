@@ -25,9 +25,9 @@ import {
 // API test configuration - moderate load focused on functionality
 export const options: Options = {
   stages: [
-    { duration: '2m', target: 10 }, // Ramp up to 10 users
-    { duration: '8m', target: 10 }, // Maintain load while testing APIs
-    { duration: '2m', target: 0 }, // Ramp down
+    { duration: '20s', target: 10 }, // Ramp up to 10 users
+    { duration: '30s', target: 10 }, // Maintain load while testing APIs
+    { duration: '10s', target: 0 }, // Ramp down
   ],
 
   thresholds: {

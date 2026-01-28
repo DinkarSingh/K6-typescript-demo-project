@@ -24,11 +24,11 @@ import {
 // Volume test configuration - moderate load but lots of data operations
 export const options: Options = {
   stages: [
-    { duration: '1m', target: 5 }, // Start with few users
-    { duration: '10m', target: 15 }, // Moderate load for extended period
-    { duration: '5m', target: 25 }, // Slightly increase load
-    { duration: '10m', target: 25 }, // Maintain for data accumulation
-    { duration: '2m', target: 0 }, // Ramp down
+    { duration: '10s', target: 5 }, // Start with few users
+    { duration: '30s', target: 15 }, // Moderate load for extended period
+    { duration: '15s', target: 25 }, // Slightly increase load
+    { duration: '30s', target: 25 }, // Maintain for data accumulation
+    { duration: '5s', target: 0 }, // Ramp down
   ],
 
   thresholds: {

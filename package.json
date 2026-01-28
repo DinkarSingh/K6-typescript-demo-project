@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "// Build Scripts": "// ===============================",
+    "build": "webpack",
+    "build:watch": "webpack --watch",
     "// Individual Test Scripts": "// ===============================",
-    "test:api": "k6 run tests/api-test.ts",
-    "test:load": "k6 run tests/load-test.ts",
-    "test:stress": "k6 run tests/stress-test.ts",
-    "test:spike": "k6 run tests/spike-test.ts",
-    "test:volume": "k6 run tests/volume-test.ts",
-    "test:soak": "k6 run tests/soak-test.ts",
+    "test:api": "npm run build && k6 run dist/api-test.js",
+    "test:load": "npm run build && k6 run dist/load-test.js",
+    "test:stress": "npm run build && k6 run dist/stress-test.js",
+    "test:spike": "npm run build && k6 run dist/spike-test.js",
+    "test:volume": "npm run build && k6 run dist/volume-test.js",
+    "test:soak": "npm run build && k6 run dist/soak-test.js",
     "// Batch Test Scripts": "// ===============================",
     "test:all": "npm run test:api && npm run test:load && npm run test:stress && npm run test:spike && npm run test:volume && npm run test:soak",
     "test:quick": "npm run test:api && npm run test:load && npm run test:spike",
@@ -27,7 +30,13 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@babel/core": "^7.28.6",
+    "@babel/preset-env": "^7.28.6",
+    "@babel/preset-typescript": "^7.28.5",
     "@types/k6": "^1.5.0",
-    "prettier": "^2.8.8"
+    "babel-loader": "^10.0.0",
+    "prettier": "^2.8.8",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1"
   }
 }

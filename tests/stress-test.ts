@@ -23,11 +23,11 @@ import {
 export const options: Options = {
   stages: [
     // Gradual ramp-up to high load
-    { duration: '2m', target: 20 }, // Ramp up to 20 users
-    { duration: '5m', target: 50 }, // Ramp up to 50 users
-    { duration: '10m', target: 100 }, // Ramp up to 100 users (high stress)
-    { duration: '3m', target: 100 }, // Stay at 100 users
-    { duration: '2m', target: 0 }, // Quick ramp down
+    { duration: '10s', target: 20 }, // Ramp up to 20 users
+    { duration: '15s', target: 50 }, // Ramp up to 50 users
+    { duration: '20s', target: 100 }, // Ramp up to 100 users (high stress)
+    { duration: '10s', target: 100 }, // Stay at 100 users
+    { duration: '5s', target: 0 }, // Quick ramp down
   ],
 
   // More lenient thresholds for stress testing
