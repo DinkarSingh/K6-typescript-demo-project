@@ -17,22 +17,22 @@ import { fetchArticles, fetchTags } from './utils.ts';
 export const options: Options = {
   stages: [
     // Normal baseline load
-    { duration: '2m', target: 10 }, // Start with normal load
+    { duration: '10s', target: 10 }, // Start with normal load
 
     // SPIKE! Sudden massive increase
-    { duration: '30s', target: 200 }, // Sudden spike to 200 users in 30 seconds!
-    { duration: '1m', target: 200 }, // Maintain spike for 1 minute
+    { duration: '10s', target: 200 }, // Sudden spike to 200 users
+    { duration: '15s', target: 200 }, // Maintain spike
 
     // Quick drop back to normal
-    { duration: '30s', target: 10 }, // Quick drop back to baseline
-    { duration: '2m', target: 10 }, // Maintain baseline
+    { duration: '5s', target: 10 }, // Quick drop back to baseline
+    { duration: '5s', target: 10 }, // Maintain baseline
 
     // Another smaller spike
-    { duration: '30s', target: 100 }, // Second spike to 100 users
-    { duration: '1m', target: 100 }, // Maintain second spike
+    { duration: '5s', target: 100 }, // Second spike to 100 users
+    { duration: '5s', target: 100 }, // Maintain second spike
 
     // Final ramp down
-    { duration: '1m', target: 0 }, // Ramp down to zero
+    { duration: '5s', target: 0 }, // Ramp down to zero
   ],
 
   // Very lenient thresholds for spike testing (spikes are expected to cause issues)
