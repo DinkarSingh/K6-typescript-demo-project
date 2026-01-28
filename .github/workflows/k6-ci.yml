@@ -1,0 +1,135 @@
+name: K6 Performance Tests CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  # Job 1: Initialize and Setup
+  setup:
+    name: 🔧 Initialize & Setup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📚 Install dependencies
+        run: npm ci
+      
+      - name: 🔨 Build tests
+        run: npm run build
+      
+      - name: 🚀 Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+      
+      - name: 🔍 Verify k6 installation
+        run: k6 version
+
+  # Job 2: Validation
+  validate:
+    name: ✅ Validation
+    runs-on: ubuntu-latest
+    needs: setup
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📚 Install dependencies
+        run: npm ci
+      
+      - name: 🔍 Check TypeScript compilation
+        run: npm run build
+      
+      - name: 📋 Validate test files
+        run: |
+          test -f tests/api-test.ts && echo "✓ api-test.ts"
+          test -f tests/load-test.ts && echo "✓ load-test.ts"
+          test -f tests/stress-test.ts && echo "✓ stress-test.ts"
+          test -f tests/spike-test.ts && echo "✓ spike-test.ts"
+          test -f tests/volume-test.ts && echo "✓ volume-test.ts"
+          test -f tests/soak-test.ts && echo "✓ soak-test.ts"
+
+  # Job 3: Run Tests
+  test:
+    name: 🧪 Run K6 Tests
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    strategy:
+      matrix:
+        test: [api, load, stress, spike, volume, soak]
+      fail-fast: false
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📚 Install dependencies
+        run: npm ci
+      
+      - name: 🔨 Build tests
+        run: npm run build
+      
+      - name: 🧪 Run ${{ matrix.test }} test
+        run: npm run test:${{ matrix.test }}:report
+        continue-on-error: true
+      
+      - name: 📊 Upload reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-report-${{ matrix.test }}
+          path: reports/
+          retention-days: 30
+
+  # Job 4: Consolidate Reports
+  consolidate:
+    name: 📦 Consolidate Reports
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+    
+    steps:
+      - name: 📥 Download reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-reports
+        continue-on-error: true
+      
+      - name: 📋 List reports
+        run: ls -R all-reports/ || echo "No reports"
+      
+      - name: 📤 Upload combined
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: k6-all-reports
+          path: all-reports/
+          retention-days: 30
