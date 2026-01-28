@@ -3,7 +3,7 @@
 
 import http from 'k6/http';
 import { check } from 'k6';
-import { config, createAuthHeader } from '../config.ts';
+import { config, createAuthHeader } from '../config';
 
 // Interface for API responses
 interface ApiResponse {

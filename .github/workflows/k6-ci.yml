@@ -29,12 +29,7 @@ jobs:
         run: npm run build
       
       - name: 🚀 Install k6
-        run: |
-          sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install k6
+        uses: grafana/setup-k6-action@v1
       
       - name: 🔍 Verify k6 installation
         run: k6 version
@@ -97,39 +92,26 @@ jobs:
       - name: 🔨 Build tests
         run: npm run build
       
-      - name: 🧪 Run ${{ matrix.test }} test
-        run: npm run test:${{ matrix.test }}:report
-        continue-on-error: true
+      - name: 🚀 Install k6
+        uses: grafana/setup-k6-action@v1
       
-      - name: 📊 Upload reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: k6-report-${{ matrix.test }}
-          path: reports/
-          retention-days: 30
+      - name: 🧪 Run ${{ matrix.test }} test and send to Grafana Cloud
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+          K6_CLOUD_HOST: ${{ secrets.K6_CLOUD_HOST }}
+        run: k6 cloud dist/${{ matrix.test }}-test.js
+        continue-on-error: true
 
-  # Job 4: Consolidate Reports
-  consolidate:
-    name: 📦 Consolidate Reports
+  # Job 4: Summary
+  summary:
+    name: 📊 Test Summary
     runs-on: ubuntu-latest
     needs: test
     if: always()
     
     steps:
-      - name: 📥 Download reports
-        uses: actions/download-artifact@v4
-        with:
-          path: all-reports
-        continue-on-error: true
-      
-      - name: 📋 List reports
-        run: ls -R all-reports/ || echo "No reports"
-      
-      - name: 📤 Upload combined
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: k6-all-reports
-          path: all-reports/
-          retention-days: 30
+      - name: 📝 Display summary
+        run: |
+          echo "✅ All k6 tests completed"
+          echo "📊 View results in Grafana Cloud"
+          echo "🔗 Dashboard: https://grafana.com/cloud"

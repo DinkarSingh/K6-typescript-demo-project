@@ -10,7 +10,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
-import { config } from '../config.ts';
+import { config } from '../config';
 import {
   fetchArticles,
   fetchTags,
@@ -19,7 +19,7 @@ import {
   loginUser,
   createArticle,
   generateRandomArticle,
-} from './utils.ts';
+} from './utils';
 
 // Volume test configuration - moderate load but lots of data operations
 export const options: Options = {
