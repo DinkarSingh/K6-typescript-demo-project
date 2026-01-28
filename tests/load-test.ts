@@ -10,14 +10,8 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
-import { config } from '../config.ts';
-import {
-  fetchArticles,
-  fetchTags,
-  loginUser,
-  registerUser,
-  generateRandomUserData,
-} from './utils.ts';
+import { config } from '../config';
+import { fetchArticles, fetchTags, loginUser, registerUser, generateRandomUserData } from './utils';
 
 // Test configuration
 export const options: Options = {
