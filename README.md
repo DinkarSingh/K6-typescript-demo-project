@@ -1,5 +1,328 @@
 # K6 Performance Testing Suite
 
+A comprehensive performance testing framework using k6 with TypeScript, featuring static validation, Grafana Cloud integration, and multiple test types.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- k6 (install from https://k6.io/docs/get-started/installation/)
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
+```
+
+## 📋 Static Validation
+
+Run static code analysis before tests to catch errors early:
+
+```bash
+npm run validate       # Run all validations (TypeScript + ESLint)
+npm run typecheck      # Run TypeScript type checking only
+npm run lint           # Run ESLint only
+npm run lint:fix       # Auto-fix linting issues
+```
+
+### Configuration Files
+
+- `tsconfig.json` - TypeScript configuration with strict type checking
+- `.eslintrc.js` - ESLint rules for code quality
+- Both configured for k6 compatibility
+
+## 🔨 Build
+
+Compile TypeScript to JavaScript:
+
+```bash
+npm run build          # Build once
+npm run build:watch    # Build and watch for changes
+```
+
+## 🧪 Running Tests
+
+### Local Testing (No Authentication Required)
+
+Each command runs validation → build → k6 run:
+
+```bash
+# Individual tests
+npm run test:api           # API endpoint tests
+npm run test:load          # Load testing
+npm run test:stress        # Stress testing
+npm run test:spike         # Spike testing
+npm run test:volume        # Volume testing
+npm run test:soak          # Soak/stability testing
+
+# Batch tests
+npm run test:all           # Run all tests
+npm run test:quick         # Run api, load, spike tests
+```
+
+### Direct k6 Commands
+
+After building, you can run tests directly:
+
+```bash
+# Run individual tests
+k6 run dist/api-test.js
+k6 run dist/load-test.js
+k6 run dist/stress-test.js
+k6 run dist/spike-test.js
+k6 run dist/volume-test.js
+k6 run dist/soak-test.js
+
+# With custom options
+k6 run --vus 10 --duration 30s dist/api-test.js
+k6 run --out json=results.json dist/load-test.js
+```
+
+### Grafana Cloud (Requires Authentication)
+
+Send results to Grafana Cloud for visualization:
+
+```bash
+# Setup environment variables first (see Environment Setup below)
+
+# Individual tests to cloud
+npm run cloud:api
+npm run cloud:load
+npm run cloud:stress
+npm run cloud:spike
+npm run cloud:volume
+npm run cloud:soak
+
+# All tests to cloud
+npm run cloud:all
+```
+
+## 🔐 Environment Setup
+
+### Local Environment
+
+1. Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+2. Add your Grafana Cloud credentials to `.env`:
+
+```env
+K6_CLOUD_TOKEN=your_grafana_cloud_token
+K6_CLOUD_HOST=https://your-instance.grafana.net
+K6_CLOUD_PROJECT_ID=your_project_id
+```
+
+3. Get credentials from:
+   - Login to [Grafana Cloud](https://grafana.com/auth/sign-in)
+   - Navigate to k6 project settings
+   - Create API token with `k6:write` permissions
+
+### CI/CD Environment
+
+Add secrets to your GitHub repository:
+
+1. Go to Settings → Secrets and variables → Actions
+2. Add:
+   - `K6_CLOUD_TOKEN`
+   - `K6_CLOUD_HOST`
+
+## 📊 Test Types
+
+### API Test (1 minute)
+
+- Validates API endpoints
+- Tests authentication flows
+- Checks response structure
+
+### Load Test (1 minute)
+
+- Normal traffic simulation
+- Baseline performance metrics
+
+### Stress Test (1 minute)
+
+- Finds breaking point
+- Tests system limits
+
+### Spike Test (1 minute)
+
+- Sudden load increases
+- Tests auto-scaling
+
+### Volume Test (1.5 minutes)
+
+- Large data operations
+- Database stress testing
+
+### Soak Test (1.5 minutes)
+
+- Long-term stability
+- Memory leak detection
+
+**Total execution time: ~7 minutes for all tests**
+
+## 📁 Project Structure
+
+```
+├── tests/                  # Test files
+│   ├── api-test.ts
+│   ├── load-test.ts
+│   ├── stress-test.ts
+│   ├── spike-test.ts
+│   ├── volume-test.ts
+│   ├── soak-test.ts
+│   └── utils.ts            # Shared utilities
+├── dist/                   # Compiled JavaScript (generated)
+├── config.ts               # Test configuration
+├── webpack.config.js       # Build configuration
+├── babel.config.js         # Transpiler config
+├── tsconfig.json           # TypeScript config
+├── .eslintrc.js            # ESLint config
+├── .env                    # Local secrets (gitignored)
+├── .env.example            # Environment template
+└── package.json            # Dependencies & scripts
+```
+
+## 🎯 Validation Features
+
+### TypeScript
+
+- Strict type checking
+- No implicit any
+- Null safety
+- Full k6 type definitions
+
+### ESLint
+
+- Zero warnings policy
+- TypeScript-aware rules
+- Auto-fixable issues
+- Consistent code style
+
+### Pre-test Validation
+
+All test commands automatically:
+
+1. ✅ Run TypeScript type checking
+2. ✅ Run ESLint (max 0 warnings)
+3. ✅ Build with webpack
+4. ✅ Execute the test
+
+## 🔄 CI/CD Integration
+
+GitHub Actions workflow automatically:
+
+1. Sets up Node.js and k6
+2. Validates TypeScript and lints code
+3. Builds tests
+4. Runs all tests and sends to Grafana Cloud
+5. Archives results
+
+See [.github/workflows/k6-ci.yml](.github/workflows/k6-ci.yml) for details.
+
+## 🛠️ Development Workflow
+
+```bash
+# 1. Make changes to test files
+vim tests/api-test.ts
+
+# 2. Run validation
+npm run validate
+
+# 3. Fix any issues
+npm run lint:fix
+
+# 4. Build
+npm run build
+
+# 5. Run test locally
+npm run test:api
+
+# OR run directly
+k6 run dist/api-test.js
+
+# 6. Send to Grafana Cloud (optional)
+npm run cloud:api
+```
+
+## 📈 Viewing Results
+
+### Local Results
+
+Results print to console with metrics:
+
+- HTTP request duration
+- Request rate
+- Virtual users
+- Check pass/fail rates
+
+### Grafana Cloud
+
+1. Login to Grafana Cloud
+2. Navigate to k6 dashboard
+3. View detailed metrics, trends, and insights
+
+## 🐛 Troubleshooting
+
+### "Cannot find name 'console'"
+
+```bash
+# Make sure @types/k6 is installed
+npm install --save-dev @types/k6
+```
+
+### "Module specifier couldn't be found"
+
+```bash
+# Don't run TypeScript files directly - build first
+npm run build
+k6 run dist/api-test.js  # Not tests/api-test.ts
+```
+
+### "Authentication failed" (Grafana Cloud)
+
+```bash
+# Check your .env file has correct token
+cat .env
+
+# Or use npm script which loads .env automatically
+npm run cloud:api
+```
+
+### Validation Errors
+
+```bash
+# Check what's failing
+npm run typecheck  # TypeScript errors
+npm run lint       # ESLint errors
+
+# Auto-fix linting
+npm run lint:fix
+```
+
+## 📚 Additional Documentation
+
+- [ENVIRONMENT.md](ENVIRONMENT.md) - Environment setup guide
+- [PROMETHEUS.md](PROMETHEUS.md) - Prometheus integration (legacy)
+- [k6 Documentation](https://k6.io/docs/)
+- [Grafana Cloud k6](https://grafana.com/docs/grafana-cloud/testing/k6/)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make changes and validate: `npm run validate`
+4. Test locally: `npm run test:quick`
+5. Submit a pull request
+
+## 📝 License
+
+ISCA comprehensive performance testing framework using k6 with TypeScript, featuring static validation, Grafana Cloud integration, and multiple test types.
 A comprehensive performance testing framework using K6 to test the RealWorld Demo application (https://demo.realworld.show/).
 
 ## 📋 Overview
