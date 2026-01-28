@@ -3,7 +3,6 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    'first-test': './tests/first-test.ts',
     'api-test': './tests/api-test.ts',
     'load-test': './tests/load-test.ts',
     'stress-test': './tests/stress-test.ts',
