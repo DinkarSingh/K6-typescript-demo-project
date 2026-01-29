@@ -43,6 +43,12 @@ export const options: Options = {
     testType: 'api',
     environment: 'demo',
   },
+
+  // Cloud configuration for Grafana Cloud k6
+  cloud: {
+    name: 'API Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
+  },
 };
 
 export function setup() {
@@ -54,7 +60,7 @@ export function setup() {
   return {};
 }
 
-export default function (data: any) {
+export default function () {
   // Run different API test scenarios
   const apiScenario = Math.random();
 
@@ -295,7 +301,9 @@ function testCompleteUserWorkflow() {
           check(favoriteResponse, {
             'User - Article favoriting works': (r) => r.status === 200 || r.status === 201,
           });
-        } catch (e) {}
+        } catch {
+          // Ignore favoriting errors
+        }
       }
     });
   });

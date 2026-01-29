@@ -41,9 +41,13 @@ export const options: Options = {
     testType: 'volume',
     environment: 'demo',
   },
-};
 
-let authenticatedUsers: any[] = [];
+  // Cloud configuration for Grafana Cloud k6
+  cloud: {
+    name: 'Volume Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
+  },
+};
 
 export function setup() {
   console.log('📊 Starting Volume Test Setup...');
@@ -96,7 +100,12 @@ export function setup() {
   return { authenticatedUsers: users };
 }
 
-export default function (data: any) {
+export default function (data: {
+  authenticatedUsers: Array<{
+    token: string;
+    userData: { username: string; email: string; password: string };
+  }>;
+}) {
   const volumeScenario = Math.random();
 
   if (volumeScenario < 0.4) {
@@ -134,7 +143,7 @@ function largePaginationTesting() {
 
   check(response, {
     [`Large pagination (${pageSize}/${offset}) - success`]: (r) => r.status === 200,
-    [`Large pagination (${pageSize}/${offset}) - reasonable time`]: (r) => {
+    [`Large pagination (${pageSize}/${offset}) - reasonable time`]: () => {
       // Larger datasets should still respond within reasonable time
       return true; // Simplified check - k6 will track timings automatically
     },
@@ -170,7 +179,7 @@ function extensiveBrowsingSimulation() {
 
     const success = check(response, {
       [`Extensive browse page ${page + 1} - success`]: (r) => r.status === 200,
-      [`Extensive browse page ${page + 1} - consistent performance`]: (r) => {
+      [`Extensive browse page ${page + 1} - consistent performance`]: () => {
         return true; // Simplified check - k6 tracks performance automatically
       },
     });
@@ -243,7 +252,12 @@ function authenticatedBulkOperations(token: string) {
   }
 }
 
-export function teardown(data: any) {
+export function teardown(data: {
+  authenticatedUsers: Array<{
+    token: string;
+    userData: { username: string; email: string; password: string };
+  }>;
+}) {
   console.log('📊 Volume Test Complete!');
   console.log('');
   console.log('📈 Volume Test Results Analysis:');

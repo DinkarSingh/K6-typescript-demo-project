@@ -1,786 +1,594 @@
 # K6 Performance Testing Suite
 
-A comprehensive performance testing framework using k6 with TypeScript, featuring static validation, Grafana Cloud integration, and multiple test types.
+A comprehensive performance testing framework using k6 with TypeScript, featuring Grafana Cloud integration, GitHub Actions CI/CD, and multiple test types for the RealWorld Demo application.
 
-## 🚀 Quick Start
+## 📋 Table of Contents
+
+- [Project Setup](#-project-setup)
+- [Test Configuration](#-test-configuration)
+- [Test Execution](#-test-execution)
+- [GitHub Actions CI/CD](#-github-actions-cicd)
+- [Grafana Cloud Test Reporting](#-grafana-cloud-test-reporting)
+- [Test Types](#-test-types)
+- [Troubleshooting](#-troubleshooting)
+
+---
+
+## 🛠️ Project Setup
 
 ### Prerequisites
 
-- Node.js 18+
-- k6 (install from https://k6.io/docs/get-started/installation/)
-- npm or yarn
+- **Node.js** 18 or higher
+- **npm** (comes with Node.js)
+- **k6** - Download from [k6.io/downloads](https://k6.io/docs/get-started/installation/)
 
-### Installation
+### Installation Steps
 
-```bash
-npm install
-```
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd K6-typescript-demo-project
+   ```
 
-## 📋 Static Validation
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Run static code analysis before tests to catch errors early:
+3. **Build the tests:**
+   ```bash
+   npm run build
+   ```
 
-```bash
-npm run validate       # Run all validations (TypeScript + ESLint)
-npm run typecheck      # Run TypeScript type checking only
-npm run lint           # Run ESLint only
-npm run lint:fix       # Auto-fix linting issues
-```
-
-### Configuration Files
-
-- `tsconfig.json` - TypeScript configuration with strict type checking
-- `.eslintrc.js` - ESLint rules for code quality
-- Both configured for k6 compatibility
-
-## 🔨 Build
-
-Compile TypeScript to JavaScript:
-
-```bash
-npm run build          # Build once
-npm run build:watch    # Build and watch for changes
-```
-
-## 🧪 Running Tests
-
-### Local Testing (No Authentication Required)
-
-Each command runs validation → build → k6 run:
-
-```bash
-# Individual tests
-npm run test:api           # API endpoint tests
-npm run test:load          # Load testing
-npm run test:stress        # Stress testing
-npm run test:spike         # Spike testing
-npm run test:volume        # Volume testing
-npm run test:soak          # Soak/stability testing
-
-# Batch tests
-npm run test:all           # Run all tests
-npm run test:quick         # Run api, load, spike tests
-```
-
-### Direct k6 Commands
-
-After building, you can run tests directly:
-
-```bash
-# Run individual tests
-k6 run dist/api-test.js
-k6 run dist/load-test.js
-k6 run dist/stress-test.js
-k6 run dist/spike-test.js
-k6 run dist/volume-test.js
-k6 run dist/soak-test.js
-
-# With custom options
-k6 run --vus 10 --duration 30s dist/api-test.js
-k6 run --out json=results.json dist/load-test.js
-```
-
-### Grafana Cloud (Requires Authentication)
-
-Send results to Grafana Cloud for visualization:
-
-```bash
-# Setup environment variables first (see Environment Setup below)
-
-# Individual tests to cloud
-npm run cloud:api
-npm run cloud:load
-npm run cloud:stress
-npm run cloud:spike
-npm run cloud:volume
-npm run cloud:soak
-
-# All tests to cloud
-npm run cloud:all
-```
-
-## 🔐 Environment Setup
-
-### Local Environment
-
-1. Copy the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-2. Add your Grafana Cloud credentials to `.env`:
-
-```env
-K6_CLOUD_TOKEN=your_grafana_cloud_token
-K6_CLOUD_HOST=https://your-instance.grafana.net
-K6_CLOUD_PROJECT_ID=your_project_id
-```
-
-3. Get credentials from:
-   - Login to [Grafana Cloud](https://grafana.com/auth/sign-in)
-   - Navigate to k6 project settings
-   - Create API token with `k6:write` permissions
-
-### CI/CD Environment
-
-Add secrets to your GitHub repository:
-
-1. Go to Settings → Secrets and variables → Actions
-2. Add:
-   - `K6_CLOUD_TOKEN`
-   - `K6_CLOUD_HOST`
-
-## 📊 Test Types
-
-### API Test (1 minute)
-
-- Validates API endpoints
-- Tests authentication flows
-- Checks response structure
-
-### Load Test (1 minute)
-
-- Normal traffic simulation
-- Baseline performance metrics
-
-### Stress Test (1 minute)
-
-- Finds breaking point
-- Tests system limits
-
-### Spike Test (1 minute)
-
-- Sudden load increases
-- Tests auto-scaling
-
-### Volume Test (1.5 minutes)
-
-- Large data operations
-- Database stress testing
-
-### Soak Test (1.5 minutes)
-
-- Long-term stability
-- Memory leak detection
-
-**Total execution time: ~7 minutes for all tests**
-
-## 📁 Project Structure
+### Project Structure
 
 ```
-├── tests/                  # Test files
-│   ├── api-test.ts
-│   ├── load-test.ts
-│   ├── stress-test.ts
-│   ├── spike-test.ts
-│   ├── volume-test.ts
-│   ├── soak-test.ts
-│   └── utils.ts            # Shared utilities
-├── dist/                   # Compiled JavaScript (generated)
-├── config.ts               # Test configuration
-├── webpack.config.js       # Build configuration
-├── babel.config.js         # Transpiler config
-├── tsconfig.json           # TypeScript config
-├── .eslintrc.js            # ESLint config
-├── .env                    # Local secrets (gitignored)
-├── .env.example            # Environment template
-└── package.json            # Dependencies & scripts
+K6-typescript-demo-project/
+├── tests/
+│   ├── api-test.ts           # API endpoint validation
+│   ├── load-test.ts          # Normal traffic simulation
+│   ├── stress-test.ts        # High load testing
+│   ├── spike-test.ts         # Sudden traffic spikes
+│   ├── volume-test.ts        # Large data operations
+│   ├── soak-test.ts          # Long-term stability
+│   └── utils.ts              # Shared utility functions
+├── dist/                     # Compiled JavaScript (auto-generated)
+├── .github/workflows/
+│   └── k6-ci.yml             # GitHub Actions workflow
+├── config.ts                 # Centralized test configuration
+├── tsconfig.json             # TypeScript configuration
+├── webpack.config.js         # Build configuration
+├── .env                      # Local environment variables (gitignored)
+├── .env.example              # Environment template
+└── package.json              # Dependencies and scripts
 ```
 
-## 🎯 Validation Features
+### Dependencies
 
-### TypeScript
+**Core:**
+- `@types/k6` - TypeScript definitions for k6
+- `typescript` - TypeScript compiler
+- `webpack` - Bundles TypeScript into k6-compatible JavaScript
 
-- Strict type checking
-- No implicit any
-- Null safety
-- Full k6 type definitions
+**Development:**
+- `eslint` - Code linting
+- `prettier` - Code formatting
+- `dotenv` - Environment variable management
 
-### ESLint
+---
 
-- Zero warnings policy
-- TypeScript-aware rules
-- Auto-fixable issues
-- Consistent code style
-
-### Pre-test Validation
-
-All test commands automatically:
-
-1. ✅ Run TypeScript type checking
-2. ✅ Run ESLint (max 0 warnings)
-3. ✅ Build with webpack
-4. ✅ Execute the test
-
-## 🔄 CI/CD Integration
-
-GitHub Actions workflow automatically:
-
-1. Sets up Node.js and k6
-2. Validates TypeScript and lints code
-3. Builds tests
-4. Runs all tests and sends to Grafana Cloud
-5. Archives results
-
-See [.github/workflows/k6-ci.yml](.github/workflows/k6-ci.yml) for details.
-
-## 🛠️ Development Workflow
-
-```bash
-# 1. Make changes to test files
-vim tests/api-test.ts
-
-# 2. Run validation
-npm run validate
-
-# 3. Fix any issues
-npm run lint:fix
-
-# 4. Build
-npm run build
-
-# 5. Run test locally
-npm run test:api
-
-# OR run directly
-k6 run dist/api-test.js
-
-# 6. Send to Grafana Cloud (optional)
-npm run cloud:api
-```
-
-## 📈 Viewing Results
-
-### Local Results
-
-Results print to console with metrics:
-
-- HTTP request duration
-- Request rate
-- Virtual users
-- Check pass/fail rates
-
-### Grafana Cloud
-
-1. Login to Grafana Cloud
-2. Navigate to k6 dashboard
-3. View detailed metrics, trends, and insights
-
-## 🐛 Troubleshooting
-
-### "Cannot find name 'console'"
-
-```bash
-# Make sure @types/k6 is installed
-npm install --save-dev @types/k6
-```
-
-### "Module specifier couldn't be found"
-
-```bash
-# Don't run TypeScript files directly - build first
-npm run build
-k6 run dist/api-test.js  # Not tests/api-test.ts
-```
-
-### "Authentication failed" (Grafana Cloud)
-
-```bash
-# Check your .env file has correct token
-cat .env
-
-# Or use npm script which loads .env automatically
-npm run cloud:api
-```
-
-### Validation Errors
-
-```bash
-# Check what's failing
-npm run typecheck  # TypeScript errors
-npm run lint       # ESLint errors
-
-# Auto-fix linting
-npm run lint:fix
-```
-
-## 📚 Additional Documentation
-
-- [ENVIRONMENT.md](ENVIRONMENT.md) - Environment setup guide
-- [PROMETHEUS.md](PROMETHEUS.md) - Prometheus integration (legacy)
-- [k6 Documentation](https://k6.io/docs/)
-- [Grafana Cloud k6](https://grafana.com/docs/grafana-cloud/testing/k6/)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes and validate: `npm run validate`
-4. Test locally: `npm run test:quick`
-5. Submit a pull request
-
-## 📝 License
-
-ISCA comprehensive performance testing framework using k6 with TypeScript, featuring static validation, Grafana Cloud integration, and multiple test types.
-A comprehensive performance testing framework using K6 to test the RealWorld Demo application (https://demo.realworld.show/).
-
-## 📋 Overview
-
-This testing suite provides multiple types of performance tests to thoroughly evaluate your application under different conditions:
-
-- **Load Testing** - Normal expected traffic patterns
-- **Stress Testing** - High load beyond normal capacity
-- **Spike Testing** - Sudden dramatic load increases
-- **Volume Testing** - Large amounts of data operations
-- **Soak Testing** - Long-term stability and endurance
-- **API Testing** - Comprehensive endpoint validation
-
-## 🏗️ Project Structure
-
-```
-k6_performance_test/
-├── config.ts                 # Central configuration file
-├── test-runner.ts            # Test information and runner guide
-├── package.json              # Node.js dependencies
-└── tests/
-    ├── utils.ts              # Shared utility functions
-    ├── load-test.ts          # Load testing (normal traffic)
-    ├── stress-test.ts        # Stress testing (high load)
-    ├── spike-test.ts         # Spike testing (sudden increases)
-    ├── volume-test.ts        # Volume testing (large data)
-    ├── soak-test.ts          # Soak testing (endurance)
-    └── api-test.ts           # API testing (comprehensive)
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-1. **Install K6**: https://k6.io/docs/get-started/installation/
-2. **Node.js**: For TypeScript support (already set up)
-
-### Running Tests
-
-#### 1. Build the tests
-
-```bash
-npm run build
-```
-
-#### 2. API Test (Start Here!)
-
-_Validates basic functionality and API endpoints_
-
-```bash
-k6 run tests/api-test.ts
-```
-
-- **Duration**: ~12 minutes
-- **Users**: 10 concurrent
-- **Purpose**: Validate API functionality before performance testing
-
-#### 3. Load Test
-
-_Establishes baseline performance under normal conditions_
-
-```bash
-k6 run tests/load-test.ts
-```
-
-- **Duration**: ~16 minutes
-- **Users**: 10-20 concurrent
-- **Purpose**: Understand normal performance characteristics
-
-#### 4. Stress Test
-
-_Finds your application's breaking point_
-
-```bash
-k6 run tests/stress-test.ts
-```
-
-- **Duration**: ~22 minutes
-- **Users**: 20-100 concurrent
-- **Purpose**: Identify maximum sustainable load
-
-#### 5. Spike Test
-
-_Tests behavior during sudden traffic increases_
-
-```bash
-k6 run tests/spike-test.ts
-```
-
-- **Duration**: ~8 minutes
-- **Users**: 10-200 concurrent (sudden spikes)
-- **Purpose**: Validate traffic spike handling
-
-#### 6. Volume Test
-
-_Tests performance with large amounts of data_
-
-```bash
-k6 run tests/volume-test.ts
-```
-
-- **Duration**: ~28 minutes
-- **Users**: 5-25 concurrent
-- **Purpose**: Database and data handling performance
-
-#### 7. Soak Test (Advanced)
-
-_Long-term stability and memory leak detection_
-
-```bash
-k6 run tests/soak-test.ts
-```
-
-- **Duration**: ~40 minutes (extend for production)
-- **Users**: 20 concurrent (steady)
-- **Purpose**: Long-term stability analysis
-
-## 📊 Understanding Results
-
-### Key Metrics to Monitor
-
-#### Response Times
-
-- **http_req_duration**: How long requests take
-- **p(95)**: 95% of requests complete within this time
-- **p(99)**: 99% of requests complete within this time
-
-#### Throughput
-
-- **http_reqs**: Requests per second
-- **data_received/sent**: Network throughput
-
-#### Reliability
-
-- **http_req_failed**: Percentage of failed requests
-- **checks**: Percentage of validation checks that passed
-
-### Performance Thresholds
-
-Each test has specific performance thresholds:
-
-```typescript
-// Example Load Test Thresholds
-thresholds: {
-  http_req_duration: ['p(95)<2000'],  // 95% under 2 seconds
-  http_req_failed: ['rate<0.1'],      // Less than 10% failures
-  http_reqs: ['rate>10'],             // At least 10 req/sec
-}
-```
-
-## 🎯 Test Types Explained
-
-### 1. Load Test - Normal Traffic Simulation
-
-**When to use**: Always run this first to establish baseline performance.
-
-**What it tests**:
-
-- Normal user behavior patterns
-- Typical response times
-- System stability under expected load
-- Resource utilization patterns
-
-**Scenarios**:
-
-- 60% users browse articles
-- 20% users browse articles and tags
-- 20% users perform authenticated actions
-
-### 2. Stress Test - Beyond Normal Capacity
-
-**When to use**: After load test, to find your limits.
-
-**What it tests**:
-
-- Maximum sustainable load
-- Performance degradation patterns
-- System recovery after stress
-- Error handling under pressure
-
-**Load Pattern**:
-
-- Gradual ramp from 20 → 50 → 100 users
-- Tests breaking points and recovery
-
-### 3. Spike Test - Sudden Load Increases
-
-**When to use**: To prepare for viral content, flash sales, etc.
-
-**What it tests**:
-
-- Behavior during sudden 20x load increase
-- Auto-scaling responsiveness
-- Circuit breaker effectiveness
-- Recovery after spike ends
-
-**Scenarios Simulated**:
-
-- Viral social media posts
-- Flash sales or limited offers
-- Breaking news events
-- Product launches
-
-### 4. Volume Test - Large Data Operations
-
-**When to use**: Applications handling large datasets.
-
-**What it tests**:
-
-- Database performance with many records
-- Pagination efficiency
-- Memory usage with large responses
-- Data consistency under load
-
-**Focus Areas**:
-
-- Deep pagination performance
-- Large page size handling
-- Bulk data operations
-- Long-running data queries
-
-### 5. Soak Test - Long-term Stability
-
-**When to use**: Before production deployment.
-
-**What it tests**:
-
-- Memory leaks over time
-- Resource accumulation
-- Performance degradation
-- Long-term system stability
-
-**Duration**: 30 minutes (demo) → 4-24 hours (production)
-
-### 6. API Test - Comprehensive Validation
-
-**When to use**: First test to run, validates functionality.
-
-**What it tests**:
-
-- All API endpoints systematically
-- Authentication and authorization
-- Data integrity and validation
-- Error handling and edge cases
-- Complete user workflows
-
-## 🛠️ Configuration
+## ⚙️ Test Configuration
 
 ### Central Configuration (`config.ts`)
 
-All test settings are centralized in `config.ts`:
+All tests use a centralized configuration file that defines endpoints, thresholds, and test parameters.
+
+**Key configuration sections:**
 
 ```typescript
 export const config = {
   baseUrl: 'https://demo.realworld.show',
+  
   endpoints: {
     articles: '/api/articles',
     login: '/api/users/login',
+    register: '/api/users',
+    tags: '/api/tags',
     // ... more endpoints
   },
+  
   thresholds: {
     load: {
-      /* load test thresholds */
+      http_req_duration: ['p(95)<2000'],
+      http_req_failed: ['rate<0.1'],
+      http_reqs: ['rate>10'],
     },
-    stress: {
-      /* stress test thresholds */
-    },
-    // ... per test type
+    // ... thresholds for each test type
+  }
+};
+```
+
+### Test Options
+
+Each test file includes k6 options for load patterns and cloud configuration:
+
+```typescript
+export const options = {
+  // Load pattern
+  stages: [
+    { duration: '30s', target: 10 },  // Ramp up
+    { duration: '1m', target: 10 },   // Steady state
+    { duration: '30s', target: 0 },   // Ramp down
+  ],
+  
+  // Performance thresholds
+  thresholds: {
+    http_req_duration: ['p(95)<2000'],
+    http_req_failed: ['rate<0.1'],
+  },
+  
+  // Grafana Cloud configuration
+  cloud: {
+    name: 'Load Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
   },
 };
 ```
 
-### Customizing Tests
+### Environment Variables
 
-#### Change Target URL
+Create a `.env` file for local Grafana Cloud configuration:
 
-Edit `config.ts`:
-
-```typescript
-baseUrl: 'https://your-api.com';
+```env
+# Grafana Cloud k6 Configuration
+GRAFANA_CLOUD_API_TOKEN=your_api_token_here
+GRAFANA_CLOUD_HOST=https://ingest.k6.io
+GRAFANA_CLOUD_PROJECT_ID=write_your_project_id
 ```
 
-#### Adjust Load Patterns
-
-Edit individual test files:
-
-```typescript
-stages: [
-  { duration: '2m', target: 20 }, // Your desired pattern
-  { duration: '5m', target: 20 },
-  { duration: '2m', target: 0 },
-];
-```
-
-#### Modify Thresholds
-
-Edit `config.ts` thresholds section:
-
-```typescript
-load: {
-  http_req_duration: ['p(95)<1000'], // Stricter: under 1s
-  http_req_failed: ['rate<0.05'],    // Stricter: under 5%
-}
-```
-
-## 📈 Best Practices
-
-### Testing Sequence for New Applications
-
-1. **API Test** → Validate basic functionality
-2. **Load Test** → Establish baseline performance
-3. **Stress Test** → Find system limits
-4. **Spike Test** → Validate spike handling
-5. **Volume Test** → (If applicable) Test data handling
-6. **Soak Test** → Long-term stability (production)
-
-### Interpreting Results
-
-#### ✅ Good Results
-
-- Consistent response times
-- Low error rates (< 1%)
-- Stable throughput
-- Quick recovery after stress
-
-#### ⚠️ Warning Signs
-
-- Gradually increasing response times
-- Error rates > 5%
-- Timeouts under normal load
-- Memory leaks in soak tests
-
-#### ❌ Critical Issues
-
-- Service unavailability
-- Data corruption
-- Cascading failures
-- System crashes
-
-### Production Considerations
-
-#### Soak Test Duration
-
-- **Development**: 30-60 minutes
-- **Staging**: 2-4 hours
-- **Production Validation**: 8-24 hours
-
-#### Load Test Scaling
-
-- Start with 10% of expected production load
-- Gradually increase to 100% and beyond
-- Test with production-like data volumes
-
-## 🔍 Monitoring & Analysis
-
-### During Tests
-
-Monitor these system metrics alongside k6 results:
-
-- CPU and memory usage
-- Database performance
-- Network I/O
-- Error logs
-- Response time distributions
-
-### After Tests
-
-1. **Response Time Analysis**
-
-   - Look for trends and patterns
-   - Identify slow endpoints
-   - Check for performance degradation
-
-2. **Error Analysis**
-
-   - Categorize error types
-   - Identify error patterns
-   - Check error recovery
-
-3. **Resource Analysis**
-   - Memory usage patterns
-   - CPU utilization
-   - Database connection pools
-   - File handles and network connections
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-#### "Connection Refused" Errors
-
-- Check if target URL is accessible
-- Verify network connectivity
-- Check if application is running
-
-#### "Too Many Requests" (429) Errors
-
-- Expected during stress/spike tests
-- May indicate rate limiting (good!)
-- Reduce load or adjust test timing
-
-#### TypeScript Compilation Errors
-
-- Ensure @types/k6 is installed: `npm install --save-dev @types/k6`
-- Check import paths in test files
-
-#### High Memory Usage During Tests
-
-- Normal for volume/soak tests
-- Monitor k6 process memory
-- Reduce concurrent users if needed
-
-### Performance Issues
-
-#### Slow Response Times
-
-1. Check network latency to target
-2. Verify target system resources
-3. Review database performance
-4. Check for resource contention
-
-#### Inconsistent Results
-
-1. Run tests multiple times
-2. Check for external factors (network, other load)
-3. Verify test environment stability
-4. Use longer test durations for accuracy
-
-## 📚 Additional Resources
-
-### K6 Documentation
-
-- **Official Docs**: https://k6.io/docs/
-- **API Reference**: https://k6.io/docs/javascript-api/
-- **Examples**: https://k6.io/docs/examples/
-
-### Performance Testing Best Practices
-
-- **Load Testing Guide**: https://k6.io/docs/testing-guides/
-- **Performance Monitoring**: https://k6.io/docs/results-visualization/
-- **CI/CD Integration**: https://k6.io/docs/integrations/
-
-### RealWorld API Documentation
-
-- **API Spec**: https://github.com/gothinkster/realworld/tree/master/api
-- **Demo Site**: https://demo.realworld.show/
+**Important:** Never commit `.env` to version control. Use `.env.example` as a template.
 
 ---
 
-## 🎉 Getting Started Checklist
+## 🧪 Test Execution
 
-- [ ] Install k6 on your system
-- [ ] Run `npm install` to set up TypeScript support
-- [ ] Start with API test: `k6 run tests/api-test.ts`
-- [ ] Run load test: `k6 run tests/load-test.ts`
-- [ ] Review and understand the results
-- [ ] Customize tests for your specific needs
-- [ ] Set up monitoring for your target application
-- [ ] Create a testing schedule for regular validation
+### Local Testing (Without Cloud Reporting)
 
-**Happy Performance Testing! 🚀**
+Run tests locally to validate functionality:
+
+```bash
+# Individual tests
+npm run test:api          # API validation
+npm run test:load         # Load testing
+npm run test:stress       # Stress testing
+npm run test:spike        # Spike testing
+npm run test:volume       # Volume testing
+npm run test:soak         # Soak testing
+
+# Batch execution
+npm run test:quick        # API + Load + Spike (fastest)
+npm run test:all          # All tests (~7 minutes)
+```
+
+### Cloud Testing (With Grafana Reporting)
+
+Send test results to Grafana Cloud for visualization:
+
+```bash
+# Individual cloud tests
+npm run cloud:api         # Upload API test results
+npm run cloud:load        # Upload Load test results
+npm run cloud:stress      # Upload Stress test results
+npm run cloud:spike       # Upload Spike test results
+npm run cloud:volume      # Upload Volume test results
+npm run cloud:soak        # Upload Soak test results
+
+# All tests with cloud reporting
+npm run cloud:all         # Upload all test results
+```
+
+### Direct k6 Commands
+
+After building (`npm run build`), you can run k6 directly:
+
+```bash
+# Local execution
+k6 run dist/api-test.js
+
+# Cloud execution (requires env vars)
+k6 cloud dist/api-test.js
+
+# Custom options
+k6 run --vus 20 --duration 2m dist/load-test.js
+```
+
+### Validation & Development
+
+```bash
+# Type checking and linting
+npm run validate          # TypeScript + ESLint
+npm run typecheck         # TypeScript compilation check
+npm run lint              # ESLint check
+npm run lint:fix          # Auto-fix linting issues
+
+# Code formatting
+npm run format            # Format all files
+npm run format:check      # Check formatting
+
+# Build
+npm run build             # Build once
+npm run build:watch       # Build and watch for changes
+```
+
+---
+
+## 🔄 GitHub Actions CI/CD
+
+### Workflow Overview
+
+The CI/CD pipeline automatically runs on:
+- **Push** to `main`, `master`, or `develop` branches
+- **Pull requests** targeting these branches
+
+### Pipeline Jobs
+
+**1. Setup** (🔧 Initialize & Setup)
+- Checks out code
+- Sets up Node.js 18
+- Installs dependencies
+- Builds tests
+- Installs k6
+
+**2. Validation** (✅ Validation)
+- TypeScript compilation
+- Validates all test files exist
+
+**3. Test Execution** (🧪 Run K6 Tests)
+- Runs all 6 test types in parallel (matrix strategy)
+- Verifies Grafana Cloud configuration
+- Uploads results to Grafana Cloud
+- Tests: `[api, load, stress, spike, volume, soak]`
+
+**4. Summary** (📊 Test Summary)
+- Displays completion status
+- Provides Grafana dashboard link
+
+### Required GitHub Secrets
+
+Configure these in: **Settings** → **Secrets and variables** → **Actions**
+
+| Secret Name | Value | Description |
+|------------|-------|-------------|
+| `GRAFANA_CLOUD_API_TOKEN` | Your k6 Personal API token | Authentication for Grafana Cloud |
+| `GRAFANA_CLOUD_HOST` | `https://ingest.k6.io` | k6 Cloud API endpoint |
+| `GRAFANA_CLOUD_PROJECT_ID` | `6527709` | Your Grafana k6 project ID |
+
+### Workflow File Location
+
+Located at: `.github/workflows/k6-ci.yml`
+
+Key workflow step:
+
+```yaml
+- name: 🧪 Run ${{ matrix.test }} test and send to Grafana Cloud
+  env:
+    K6_CLOUD_TOKEN: ${{ secrets.GRAFANA_CLOUD_API_TOKEN }}
+    K6_CLOUD_HOST: ${{ secrets.GRAFANA_CLOUD_HOST }}
+    K6_CLOUD_PROJECT_ID: ${{ secrets.GRAFANA_CLOUD_PROJECT_ID }}
+  run: k6 cloud dist/${{ matrix.test }}-test.js
+```
+
+### Viewing CI/CD Results
+
+1. Go to your repository's **Actions** tab
+2. Click on the workflow run
+3. View individual test job results
+4. Check the summary for Grafana dashboard link
+
+---
+
+## 📊 Grafana Cloud Test Reporting
+
+### Initial Setup
+
+#### Step 1: Get Your k6 API Token
+
+1. Navigate to your Grafana Cloud k6 project settings:
+   - **Testing & synthetics** → **Performance** → **Settings** → **Personal token**
+   - Direct URL: `https://dinkarsingh.grafana.net/a/k6-app/settings/api-token`
+
+2. Click **"Regenerate API token"** button
+
+3. Copy the generated token (long hexadecimal string)
+
+#### Step 2: Configure Local Environment
+
+1. Copy the example file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` with your credentials:
+   ```env
+   GRAFANA_CLOUD_API_TOKEN=your_actual_token_here
+   GRAFANA_CLOUD_HOST=https://ingest.k6.io
+   GRAFANA_CLOUD_PROJECT_ID=6527709
+   ```
+
+   **Critical:** The host **must** be `https://ingest.k6.io` (API endpoint, not web UI URL)
+
+#### Step 3: Configure GitHub Repository
+
+For automated CI/CD reporting:
+
+1. Go to repository **Settings** → **Secrets and variables** → **Actions**
+
+2. Click **"New repository secret"** and add each secret:
+
+   **Secret 1:**
+   - Name: `GRAFANA_CLOUD_API_TOKEN`
+   - Value: Your k6 Personal API token
+
+   **Secret 2:**
+   - Name: `GRAFANA_CLOUD_HOST`
+   - Value: `https://ingest.k6.io`
+
+   **Secret 3:**
+   - Name: `GRAFANA_CLOUD_PROJECT_ID`
+   - Value: `6527709`
+
+3. **Important:** Ensure no extra spaces before/after values
+
+#### Step 4: Test the Setup
+
+Run a test locally to verify configuration:
+
+```bash
+npm run cloud:api
+```
+
+**Expected output:**
+```
+Init   [   0% ] Loading test script...
+Init   [   0% ] Building the archive...
+Init   [ 100% ] Uploading to Grafana Cloud...
+
+Test finished
+```
+
+#### Step 5: View Results
+
+Access your test results at:
+```
+https://dinkarsingh.grafana.net/a/k6-app/projects/6527709
+```
+
+### Understanding Grafana Dashboards
+
+#### Key Metrics Displayed:
+
+**Performance Metrics:**
+- Response time percentiles (p90, p95, p99)
+- Request rate (requests/second)
+- Data transfer rates (sent/received)
+
+**Reliability Metrics:**
+- HTTP error rates
+- Check failure rates
+- Threshold violations
+
+**Load Pattern:**
+- Virtual users over time
+- Request distribution
+- Stage transitions
+
+#### Analyzing Test Results:
+
+**1. Response Time Trends**
+- Look for degradation over time
+- Compare p95 vs p99 (consistency indicator)
+- Identify slow endpoints
+
+**2. Error Analysis**
+- Check error rate percentage
+- Review error types and patterns
+- Correlate errors with load levels
+
+**3. Threshold Compliance**
+- Green ✓ = Passed thresholds
+- Red ✗ = Failed thresholds
+- Review failed thresholds for performance issues
+
+**4. Comparing Test Runs**
+- Select multiple runs for comparison
+- Track performance improvements/regressions
+- Identify trends across deployments
+
+---
+
+## 🎯 Test Types
+
+| Test | Duration | VUs | Purpose |
+|------|----------|-----|---------|
+| **API Test** | 1 min | 10 | Validates endpoints, authentication, data integrity |
+| **Load Test** | 1 min | 10-20 | Normal traffic patterns, baseline metrics |
+| **Stress Test** | 1 min | 20-100 | Finding breaking points, system limits |
+| **Spike Test** | 1 min | 10-200 | Sudden traffic increases, auto-scaling |
+| **Volume Test** | 1.5 min | 5-25 | Large data operations, database performance |
+| **Soak Test** | 1.5 min | 20 | Long-term stability, memory leaks |
+
+**Total execution time:** ~7 minutes for all tests
+
+### Test Details
+
+#### 1. API Test
+**Focus:** Comprehensive endpoint validation
+- User registration and authentication
+- Article CRUD operations
+- Tag management
+- Error handling and edge cases
+
+#### 2. Load Test
+**Focus:** Normal operating conditions
+- 60% users browse articles
+- 20% users browse articles and tags
+- 20% users perform authenticated actions
+
+#### 3. Stress Test
+**Focus:** System breaking points
+- Progressive load increase (20 → 100 users)
+- Aggressive user behaviors
+- System recovery observation
+
+#### 4. Spike Test
+**Focus:** Sudden traffic surges
+- Rapid scaling (10 → 200 users)
+- System resilience testing
+- Auto-scaling validation
+
+#### 5. Volume Test
+**Focus:** Large data handling
+- Deep pagination testing
+- Bulk operations
+- Database query performance
+
+#### 6. Soak Test
+**Focus:** Long-term stability
+- Steady load over extended period
+- Memory leak detection
+- Resource accumulation monitoring
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### ❌ Authentication Failed (401)
+
+**Error:** `Auth failed with status 401`
+
+**Causes:**
+- Invalid or expired API token
+- Missing API token
+
+**Solutions:**
+1. Regenerate token in Grafana k6 settings
+2. Update `.env` file with new token
+3. Update GitHub secret `GRAFANA_CLOUD_API_TOKEN`
+4. Ensure no extra spaces in token value
+
+---
+
+#### ❌ Unsupported Protocol Scheme
+
+**Error:** `Post "***/v1/validate-options": unsupported protocol scheme ""`
+
+**Causes:**
+- Missing `https://` in host URL
+- Empty `K6_CLOUD_HOST` variable
+
+**Solutions:**
+1. Verify `.env` has: `GRAFANA_CLOUD_HOST=https://ingest.k6.io`
+2. Check GitHub secret `GRAFANA_CLOUD_HOST` = `https://ingest.k6.io`
+3. Ensure no typos or extra characters
+
+---
+
+#### ❌ Tests Don't Appear in Grafana
+
+**Causes:**
+- Incorrect project ID
+- Wrong host URL (using web UI instead of API)
+- Missing cloud configuration in test files
+
+**Solutions:**
+1. Verify `GRAFANA_CLOUD_HOST=https://ingest.k6.io` (NOT grafana.net)
+2. Confirm project ID: `6527709`
+3. Check test files have `cloud` configuration
+4. Review k6 command output for upload confirmation
+
+---
+
+#### ❌ GitHub Actions Failures
+
+**Error:** Workflow shows red ✗
+
+**Debug Steps:**
+1. Check **Actions** tab → Failed workflow
+2. Expand failed job to see error details
+3. Verify all 3 GitHub secrets are set correctly
+4. Check "Verify Grafana Cloud Configuration" step output
+5. Ensure secrets have no extra spaces
+
+**Common Issues:**
+- Secret not set: `K6_CLOUD_HOST: NOT SET`
+- Typo in secret name
+- Secret value has trailing spaces
+
+---
+
+#### ❌ Build Errors
+
+**Error:** TypeScript compilation fails
+
+**Solutions:**
+```bash
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Check for errors
+npm run typecheck
+
+# Fix linting issues
+npm run lint:fix
+```
+
+---
+
+#### ❌ Exit Code 99
+
+**Error:** `Exit Code: 99` (Threshold violation)
+
+**Cause:** Performance thresholds not met (expected in demo environments)
+
+**Solutions:**
+- Review which thresholds failed in output
+- Adjust thresholds in `config.ts` if needed
+- Check if target API is overloaded
+- This is informational, not a critical failure
+
+---
+
+### Validation Commands
+
+```bash
+# Verify environment configuration
+cat .env
+
+# Test Grafana Cloud connection
+npm run cloud:api
+
+# Check build output
+npm run build
+ls -la dist/
+
+# Validate code quality
+npm run validate
+```
+
+---
+
+## 📚 Resources
+
+- **k6 Documentation:** [k6.io/docs](https://k6.io/docs/)
+- **Grafana Cloud k6:** [grafana.com/docs/grafana-cloud/testing/k6](https://grafana.com/docs/grafana-cloud/testing/k6/)
+- **k6 Cloud REST API:** [k6.io/docs/cloud/cloud-reference/cloud-rest-api](https://k6.io/docs/cloud/cloud-reference/cloud-rest-api/)
+- **RealWorld API Spec:** [github.com/gothinkster/realworld](https://github.com/gothinkster/realworld/tree/master/api)
+
+---
+
+## 📝 License
+
+ISC

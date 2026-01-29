@@ -10,14 +10,8 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
-import { config } from '../config.ts';
-import {
-  fetchArticles,
-  fetchTags,
-  generateRandomUserData,
-  registerUser,
-  loginUser,
-} from './utils.ts';
+import { config } from '../config';
+import { fetchArticles, generateRandomUserData, registerUser, loginUser } from './utils';
 
 // Stress test configuration - higher load than normal
 export const options: Options = {
@@ -36,6 +30,12 @@ export const options: Options = {
   tags: {
     testType: 'stress',
     environment: 'demo',
+  },
+
+  // Cloud configuration for Grafana Cloud k6
+  cloud: {
+    name: 'Stress Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
   },
 };
 
@@ -65,7 +65,12 @@ export function setup() {
   return { testUsers: testUsers };
 }
 
-export default function (data: any) {
+export default function (data: {
+  testUsers: Array<{
+    token: string;
+    userData: { username: string; email: string; password: string };
+  }>;
+}) {
   // More aggressive user behavior patterns during stress test
   const behaviorType = Math.random();
 
@@ -169,7 +174,7 @@ function authenticatedStressActions(token: string) {
   });
 }
 
-export function teardown(data: any) {
+export function teardown() {
   console.log('🏁 Stress Test Complete!');
   console.log('');
   console.log('📊 Stress Test Results Analysis:');

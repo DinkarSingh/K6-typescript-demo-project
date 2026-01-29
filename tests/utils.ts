@@ -8,7 +8,7 @@ import { config, createAuthHeader } from '../config';
 // Interface for API responses
 interface ApiResponse {
   status: number;
-  body: any;
+  body: unknown;
   headers: object;
   timings?: {
     duration?: number;
@@ -33,7 +33,11 @@ interface LoginResponse {
  * @param userData - User registration data
  * @returns Registration response
  */
-export function registerUser(userData: any): ApiResponse {
+export function registerUser(userData: {
+  username: string;
+  email: string;
+  password: string;
+}): ApiResponse {
   const payload = {
     user: {
       username: userData.username,
@@ -138,7 +142,10 @@ export function fetchArticles(limit: number = 20, offset: number = 0): ApiRespon
  * @param articleData - Article data
  * @returns Article creation response
  */
-export function createArticle(token: string, articleData: any): ApiResponse {
+export function createArticle(
+  token: string,
+  articleData: { title: string; description: string; body: string; tagList?: string[] },
+): ApiResponse {
   const payload = {
     article: articleData,
   };

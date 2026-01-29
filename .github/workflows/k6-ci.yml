@@ -104,15 +104,18 @@ jobs:
           echo "🔧 Grafana Cloud Configuration:"
           echo "  Host: ${K6_CLOUD_HOST:-NOT SET}"
           echo "  Project ID: ${K6_CLOUD_PROJECT_ID:-NOT SET}"
-          echo "  Token: ${K6_CLOUD_TOKEN:+SET}"${K6_CLOUD_TOKEN:-NOT SET}
+          if [ -n "$K6_CLOUD_TOKEN" ]; then
+            echo "  Token: SET"
+          else
+            echo "  Token: NOT SET"
+          fi
       
       - name: 🧪 Run ${{ matrix.test }} test and send to Grafana Cloud
         env:
           K6_CLOUD_TOKEN: ${{ secrets.GRAFANA_CLOUD_API_TOKEN }}
           K6_CLOUD_HOST: ${{ secrets.GRAFANA_CLOUD_HOST }}
-          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
+          K6_CLOUD_PROJECT_ID: ${{ secrets.GRAFANA_CLOUD_PROJECT_ID }}
         run: k6 cloud dist/${{ matrix.test }}-test.js
-        continue-on-error: true
 
   # Job 4: Summary
   summary:
