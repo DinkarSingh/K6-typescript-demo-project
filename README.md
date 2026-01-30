@@ -360,7 +360,7 @@ Test finished
 
 Access your test results at:
 ```
-https://dinkarsingh.grafana.net/a/k6-app/projects/6527709
+https://dinkarsingh.grafana.net/a/k6-app/projects/projectId
 ```
 
 ### Understanding Grafana Dashboards
