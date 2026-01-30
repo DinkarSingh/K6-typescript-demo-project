@@ -261,7 +261,7 @@ Configure these in: **Settings** → **Secrets and variables** → **Actions**
 |------------|-------|-------------|
 | `GRAFANA_CLOUD_API_TOKEN` | Your k6 Personal API token | Authentication for Grafana Cloud |
 | `GRAFANA_CLOUD_HOST` | `https://ingest.k6.io` | k6 Cloud API endpoint |
-| `GRAFANA_CLOUD_PROJECT_ID` | `6527709` | Your Grafana k6 project ID |
+| `GRAFANA_CLOUD_PROJECT_ID` | `Your Grafana project ID` | Your Grafana k6 project ID |
 
 ### Workflow File Location
 
@@ -295,7 +295,7 @@ Key workflow step:
 
 1. Navigate to your Grafana Cloud k6 project settings:
    - **Testing & synthetics** → **Performance** → **Settings** → **Personal token**
-   - Direct URL: `https://dinkarsingh.grafana.net/a/k6-app/settings/api-token`
+   - Direct URL: `https://yourprofile.grafana.net/a/k6-app/settings/api-token`
 
 2. Click **"Regenerate API token"** button
 
@@ -460,107 +460,6 @@ https://dinkarsingh.grafana.net/a/k6-app/projects/6527709
 
 ---
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### ❌ Authentication Failed (401)
-
-**Error:** `Auth failed with status 401`
-
-**Causes:**
-- Invalid or expired API token
-- Missing API token
-
-**Solutions:**
-1. Regenerate token in Grafana k6 settings
-2. Update `.env` file with new token
-3. Update GitHub secret `GRAFANA_CLOUD_API_TOKEN`
-4. Ensure no extra spaces in token value
-
----
-
-#### ❌ Unsupported Protocol Scheme
-
-**Error:** `Post "***/v1/validate-options": unsupported protocol scheme ""`
-
-**Causes:**
-- Missing `https://` in host URL
-- Empty `K6_CLOUD_HOST` variable
-
-**Solutions:**
-1. Verify `.env` has: `GRAFANA_CLOUD_HOST=https://ingest.k6.io`
-2. Check GitHub secret `GRAFANA_CLOUD_HOST` = `https://ingest.k6.io`
-3. Ensure no typos or extra characters
-
----
-
-#### ❌ Tests Don't Appear in Grafana
-
-**Causes:**
-- Incorrect project ID
-- Wrong host URL (using web UI instead of API)
-- Missing cloud configuration in test files
-
-**Solutions:**
-1. Verify `GRAFANA_CLOUD_HOST=https://ingest.k6.io` (NOT grafana.net)
-2. Confirm project ID: `6527709`
-3. Check test files have `cloud` configuration
-4. Review k6 command output for upload confirmation
-
----
-
-#### ❌ GitHub Actions Failures
-
-**Error:** Workflow shows red ✗
-
-**Debug Steps:**
-1. Check **Actions** tab → Failed workflow
-2. Expand failed job to see error details
-3. Verify all 3 GitHub secrets are set correctly
-4. Check "Verify Grafana Cloud Configuration" step output
-5. Ensure secrets have no extra spaces
-
-**Common Issues:**
-- Secret not set: `K6_CLOUD_HOST: NOT SET`
-- Typo in secret name
-- Secret value has trailing spaces
-
----
-
-#### ❌ Build Errors
-
-**Error:** TypeScript compilation fails
-
-**Solutions:**
-```bash
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-
-# Check for errors
-npm run typecheck
-
-# Fix linting issues
-npm run lint:fix
-```
-
----
-
-#### ❌ Exit Code 99
-
-**Error:** `Exit Code: 99` (Threshold violation)
-
-**Cause:** Performance thresholds not met (expected in demo environments)
-
-**Solutions:**
-- Review which thresholds failed in output
-- Adjust thresholds in `config.ts` if needed
-- Check if target API is overloaded
-- This is informational, not a critical failure
-
----
-
 ### Validation Commands
 
 ```bash
@@ -587,8 +486,3 @@ npm run validate
 - **k6 Cloud REST API:** [k6.io/docs/cloud/cloud-reference/cloud-rest-api](https://k6.io/docs/cloud/cloud-reference/cloud-rest-api/)
 - **RealWorld API Spec:** [github.com/gothinkster/realworld](https://github.com/gothinkster/realworld/tree/master/api)
 
----
-
-## 📝 License
-
-ISC
