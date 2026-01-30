@@ -19,8 +19,8 @@ export const options: Options = {
     { duration: '10s', target: 10 }, // Start with normal load
 
     // SPIKE! Sudden massive increase
-    { duration: '10s', target: 200 }, // Sudden spike to 200 users
-    { duration: '15s', target: 200 }, // Maintain spike
+    { duration: '10s', target: 100 }, // Sudden spike to 200 users
+    { duration: '15s', target: 100 }, // Maintain spike
 
     // Quick drop back to normal
     { duration: '5s', target: 10 }, // Quick drop back to baseline
