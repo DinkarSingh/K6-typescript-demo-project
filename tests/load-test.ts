@@ -10,14 +10,8 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
-import { config } from '../config.ts';
-import {
-  fetchArticles,
-  fetchTags,
-  loginUser,
-  registerUser,
-  generateRandomUserData,
-} from './utils.ts';
+import { config } from '../config';
+import { fetchArticles, fetchTags, loginUser, registerUser, generateRandomUserData } from './utils';
 
 // Test configuration
 export const options: Options = {
@@ -38,10 +32,13 @@ export const options: Options = {
     testType: 'load',
     environment: 'demo',
   },
-};
 
-// Global variables to track test state
-let userToken: string = '';
+  // Cloud configuration for Grafana Cloud k6
+  cloud: {
+    name: 'Load Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
+  },
+};
 
 // This function runs once before all test iterations
 export function setup() {
@@ -67,7 +64,10 @@ export function setup() {
 }
 
 // This is the main test function that runs for each virtual user
-export default function (data: any) {
+export default function (data: {
+  token: string;
+  userData: { username: string; email: string; password: string };
+}) {
   // Simulate different user behaviors with weighted probabilities
   const userBehavior = Math.random();
 
@@ -150,7 +150,7 @@ function authenticatedUserActions(token: string) {
 }
 
 // This function runs once after all test iterations complete
-export function teardown(data: any) {
+export function teardown() {
   console.log('🏁 Load Test Complete!');
   console.log('Check the results above to see how your application performed under normal load.');
   console.log('Key metrics to review:');

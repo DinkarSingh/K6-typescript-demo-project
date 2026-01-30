@@ -11,14 +11,8 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
-import { config } from '../config.ts';
-import {
-  fetchArticles,
-  fetchTags,
-  generateRandomUserData,
-  registerUser,
-  loginUser,
-} from './utils.ts';
+import { config } from '../config';
+import { fetchArticles, fetchTags, generateRandomUserData, registerUser, loginUser } from './utils';
 
 // Soak test configuration - moderate consistent load for extended time
 export const options: Options = {
@@ -51,12 +45,17 @@ export const options: Options = {
     environment: 'demo',
     scenario: 'soak',
   },
+
+  // Cloud configuration for Grafana Cloud k6
+  cloud: {
+    name: 'Soak Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
+  },
 };
 
 // Global variables to track soak test progress
 let testStartTime: number;
 let iterationCount = 0;
-let authenticatedUsers: any[] = [];
 
 export function setup() {
   console.log('🏃‍♂️ Starting Soak Test Setup...');
@@ -109,7 +108,14 @@ export function setup() {
   };
 }
 
-export default function (data: any) {
+export default function (data: {
+  startTime: number;
+  authenticatedUsers: Array<{
+    token: string;
+    userData: { username: string; email: string; password: string };
+    createdAt: number;
+  }>;
+}) {
   iterationCount++;
   const currentTime = Date.now();
   const elapsedMinutes = (currentTime - data.startTime) / (1000 * 60);
@@ -170,7 +176,7 @@ function steadyBrowsing() {
 
   check(articlesResponse, {
     'Soak - steady browse success': (r) => r.status === 200,
-    'Soak - steady browse performance': (r) => {
+    'Soak - steady browse performance': () => {
       return true; // Simplified check - k6 tracks performance automatically
     },
   });
@@ -253,7 +259,7 @@ function mixedLoadPattern() {
   });
 }
 
-export function teardown(data: any) {
+export function teardown(data: { startTime: number }) {
   const endTime = Date.now();
   const totalDuration = (endTime - data.startTime) / (1000 * 60); // Minutes
 

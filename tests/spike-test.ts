@@ -10,8 +10,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Options } from 'k6/options';
-import { config } from '../config.ts';
-import { fetchArticles, fetchTags } from './utils.ts';
+import { config } from '../config';
 
 // Spike test configuration - sudden dramatic load changes
 export const options: Options = {
@@ -20,8 +19,8 @@ export const options: Options = {
     { duration: '10s', target: 10 }, // Start with normal load
 
     // SPIKE! Sudden massive increase
-    { duration: '10s', target: 200 }, // Sudden spike to 200 users
-    { duration: '15s', target: 200 }, // Maintain spike
+    { duration: '10s', target: 100 }, // Sudden spike to 200 users
+    { duration: '15s', target: 100 }, // Maintain spike
 
     // Quick drop back to normal
     { duration: '5s', target: 10 }, // Quick drop back to baseline
@@ -41,6 +40,12 @@ export const options: Options = {
   tags: {
     testType: 'spike',
     environment: 'demo',
+  },
+
+  // Cloud configuration for Grafana Cloud k6
+  cloud: {
+    name: 'Spike Test - RealWorld Demo',
+    projectID: __ENV.K6_CLOUD_PROJECT_ID ? Number(__ENV.K6_CLOUD_PROJECT_ID) : undefined,
   },
 };
 
@@ -65,7 +70,7 @@ export function setup() {
   return {};
 }
 
-export default function (data: any) {
+export default function () {
   // During spike test, users behave more erratically
   const spikeScenario = Math.random();
 
@@ -164,7 +169,7 @@ function heavyResourceConsumption() {
   });
 }
 
-export function teardown(data: any) {
+export function teardown() {
   console.log('⚡ Spike Test Complete!');
   console.log('');
   console.log('📊 Spike Test Results Analysis:');

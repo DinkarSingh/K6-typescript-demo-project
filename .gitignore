@@ -1,3 +1,7 @@
 node_modules
 dist
 *.js.map
+
+# Environment variables
+.env
+.env.local
